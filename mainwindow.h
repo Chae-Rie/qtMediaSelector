@@ -2,7 +2,7 @@
 #define MAINWINDOW_H
 
 #include <QMainWindow>
-#include <QFormLayout>
+#include <QStatusBar>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
