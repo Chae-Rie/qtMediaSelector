@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>600</width>
+    <height>600</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>Startbildschirm</string>
+  </property>
+  <widget class="QWidget" name="centralwidget"/>
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>600</width>
+     <height>37</height>
+    </rect>
+   </property>
+   <widget class="QMenu" name="menuMedia_Selector">
+    <property name="title">
+     <string>Media Selector</string>
+    </property>
+   </widget>
+   <widget class="QMenu" name="menuAusleihen">
+    <property name="title">
+     <string>Mediencenter</string>
+    </property>
+    <addaction name="actionCreatingMedia"/>
+    <addaction name="actionDeleteMedia"/>
+   </widget>
+   <widget class="QMenu" name="menuR_ckgabe">
+    <property name="title">
+     <string>Meine Medien</string>
+    </property>
+    <addaction name="actionLendMedia"/>
+    <addaction name="actionReturnMedia"/>
+   </widget>
+   <addaction name="menuMedia_Selector"/>
+   <addaction name="menuAusleihen"/>
+   <addaction name="menuR_ckgabe"/>
+  </widget>
+  <widget class="QStatusBar" name="statusbar"/>
+  <action name="actionCreatingMedia">
+   <property name="text">
+    <string>Erfassen neuer Medien</string>
+   </property>
+  </action>
+  <action name="actionDeleteMedia">
+   <property name="text">
+    <string>Löschen alter Medien</string>
+   </property>
+  </action>
+  <action name="actionLendMedia">
+   <property name="text">
+    <string>Ausleihen</string>
+   </property>
+  </action>
+  <action name="actionReturnMedia">
+   <property name="text">
+    <string>Rückgabe</string>
+   </property>
+  </action>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>
