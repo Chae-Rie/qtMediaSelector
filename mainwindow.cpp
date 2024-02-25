@@ -20,8 +20,7 @@ MainWindow::~MainWindow()
     delete ui;
 }
 
-void MainWindow::on_actionCreatingMedia_triggered()
-{
+
 // Was soll passieren, wenn man in das Menü klickt?
 
  /*
@@ -35,7 +34,40 @@ void MainWindow::on_actionCreatingMedia_triggered()
   *
   * sollten dort eingetragen werden können.
   * */
+
+
+
+
+
+
+
+/*
+ * Idee:
+ * Das wechseln zwischen den Tabs zeigt verschiedene Editcontrols an, die der Benutzer dann dementsprechend
+ * mit passendem Inhalt füllen kann. Diese Editcontrols sollen, auch möglichst einfach den Input verarbeiten
+ * und auch inhaltliche Richtigkeit überprüfen.
+ * Wenn das geschehen ist, soll der Benutzer den Inhalt der Editcontrols mit einem Klick auf
+ * "Speichern" in ein generisches Objekt laden können und mit einem Klick auf "Verwerfen" alle
+ * bereits gemachten Eingaben aus dem Editcontrol löschen können.
+ *
+ * Das generische Objekt, soll dann für die Versendung an die Datenbank serialisiert werden.
+ * Die Nutzung einer einfach SQLite Datenbank wird den Job schon erledigen.
+ *
+ * Frage: Wie könnte diese Struktur des generischen Objekts aussehen?
+ * Ich könnte auch für den Anfang 3 eindeutig zu definierende Objekte verwenden, die jeweils eine
+ * Klasse bekommen.
+ * Oder ich verwende eine große Struktur mit Feldern, die im Falle eines Falles Standardwerte mit
+ * NULL zugewiesen bekommen.
+ * Was ist hier am smartesten?
+ *
+ */
+
+
+
+
+// Manuelles Schließen der App durch den Benutzer, ohne das macos-typische X zu verwenden.
+void MainWindow::on_pushButtonQuit_clicked()
+{
+
 }
-
-
 

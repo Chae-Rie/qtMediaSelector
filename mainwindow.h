@@ -19,7 +19,9 @@ public:
     ~MainWindow();
 
 private slots:
-    void on_actionCreatingMedia_triggered();
+
+
+    void on_pushButtonQuit_clicked();
 
 private:
     Ui::MainWindow *ui;
