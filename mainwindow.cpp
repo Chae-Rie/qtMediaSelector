@@ -31,6 +31,10 @@ MainWindow::~MainWindow()
   * - Genre
   * - Autor
   * - Publishdate
+  * - Verlag
+  * - Sprache des Werks
+  * - Verfügbarkeit des Artikels -> Ein Button der eine Query auslöst und dann mitteilt ob, der Artikel verliehen ist oder nicht
+  * - Erfassungsdatum --> Das ist aber nur wichtig für die AUFNAHME in der Bibliothek und weniger wichtig für den Benutzer
   *
   * sollten dort eingetragen werden können.
   * */

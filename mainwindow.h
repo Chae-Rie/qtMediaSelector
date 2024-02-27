@@ -3,6 +3,7 @@
 
 #include <QMainWindow>
 #include <QStatusBar>
+#include <QtSql/QSqlQueryModel> // Für die Abfrage von Inhalten aus der DB
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
