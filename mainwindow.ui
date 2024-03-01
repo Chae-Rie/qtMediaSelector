@@ -73,7 +73,7 @@
         <x>29</x>
         <y>10</y>
         <width>510</width>
-        <height>380</height>
+        <height>411</height>
        </rect>
       </property>
       <property name="statusTip">
@@ -83,7 +83,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>0</number>
+       <number>1</number>
       </property>
       <widget class="QWidget" name="tabBooks">
        <attribute name="title">
@@ -95,7 +95,7 @@
           <x>20</x>
           <y>10</y>
           <width>471</width>
-          <height>331</height>
+          <height>351</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayoutBooks">
@@ -120,6 +120,34 @@
          <property name="bottomMargin">
           <number>10</number>
          </property>
+         <item row="0" column="0">
+          <widget class="QLineEdit" name="lineEditISBN">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="toolTip">
+            <string>ISBN des Buches</string>
+           </property>
+           <property name="statusTip">
+            <string>Eindeutige Identifikation des Buchs durchs ISBN</string>
+           </property>
+           <property name="whatsThis">
+            <string/>
+           </property>
+           <property name="text">
+            <string/>
+           </property>
+           <property name="placeholderText">
+            <string>978-3-7471-0604-4</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="lineEditBookTitle">
            <property name="minimumSize">
@@ -188,6 +216,9 @@
            <property name="statusTip">
             <string>Erscheinungsdatum des Buches</string>
            </property>
+           <property name="currentSection">
+            <enum>QDateTimeEdit::DaySection</enum>
+           </property>
            <property name="displayFormat">
             <string>dd.MM.yyyy</string>
            </property>
@@ -226,6 +257,12 @@
              <width>200</width>
              <height>0</height>
             </size>
+           </property>
+           <property name="mouseTracking">
+            <bool>false</bool>
+           </property>
+           <property name="focusPolicy">
+            <enum>Qt::TabFocus</enum>
            </property>
            <property name="statusTip">
             <string>Wähle den aktuellen Zustand des Buches </string>
@@ -276,31 +313,35 @@
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLineEdit" name="lineEditISBN">
+         <item row="4" column="0">
+          <widget class="QPushButton" name="pushButtonBookSave">
            <property name="minimumSize">
             <size>
              <width>200</width>
              <height>0</height>
             </size>
            </property>
-           <property name="toolTip">
-            <string>ISBN des Buches</string>
-           </property>
            <property name="statusTip">
-            <string>Eindeutige Identifikation des Buchs durchs ISBN</string>
-           </property>
-           <property name="whatsThis">
-            <string/>
+            <string>Speichert die gemachten Angaben in der Datenbank</string>
            </property>
            <property name="text">
-            <string/>
+            <string>Speichern</string>
            </property>
-           <property name="placeholderText">
-            <string>978-3-7471-0604-4</string>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="pushButtonBookClearAll">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
            </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
+           <property name="statusTip">
+            <string>Löscht die gemachten Angaben aus den Steuerungselementen</string>
+           </property>
+           <property name="text">
+            <string>Eingaben löschen</string>
            </property>
           </widget>
          </item>
@@ -317,7 +358,7 @@
           <x>20</x>
           <y>20</y>
           <width>471</width>
-          <height>321</height>
+          <height>341</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayoutMagazines">
@@ -361,25 +402,6 @@
            </property>
           </widget>
          </item>
-         <item row="1" column="0">
-          <widget class="QLineEdit" name="lineEditMagazinePublisher">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="statusTip">
-            <string>Verlag der Zeitschrift</string>
-           </property>
-           <property name="placeholderText">
-            <string>z.B.: Hubert Burda Media</string>
-           </property>
-           <property name="clearButtonEnabled">
-            <bool>true</bool>
-           </property>
-          </widget>
-         </item>
          <item row="0" column="1">
           <widget class="QLineEdit" name="lineEditMagazineTitle">
            <property name="minimumSize">
@@ -393,6 +415,25 @@
            </property>
            <property name="placeholderText">
             <string>C't 2023</string>
+           </property>
+           <property name="clearButtonEnabled">
+            <bool>true</bool>
+           </property>
+          </widget>
+         </item>
+         <item row="1" column="0">
+          <widget class="QLineEdit" name="lineEditMagazinePublisher">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Verlag der Zeitschrift</string>
+           </property>
+           <property name="placeholderText">
+            <string>z.B.: Hubert Burda Media</string>
            </property>
            <property name="clearButtonEnabled">
             <bool>true</bool>
@@ -441,39 +482,6 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1">
-          <widget class="QComboBox" name="comboBoxMagazinePublishingRate">
-           <property name="minimumSize">
-            <size>
-             <width>200</width>
-             <height>0</height>
-            </size>
-           </property>
-           <property name="statusTip">
-            <string>Veröffentlichungs-Zyklus</string>
-           </property>
-           <item>
-            <property name="text">
-             <string>monatlich</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>vierteljährlich</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>halbjährlich</string>
-            </property>
-           </item>
-           <item>
-            <property name="text">
-             <string>jährlich</string>
-            </property>
-           </item>
-          </widget>
-         </item>
          <item row="3" column="0">
           <widget class="QComboBox" name="comboBoxMagazinesCondition">
            <property name="minimumSize">
@@ -512,6 +520,87 @@
            </item>
           </widget>
          </item>
+         <item row="4" column="0">
+          <widget class="QPushButton" name="pushButtonMagazineSave">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Speichert die gemachten Angaben in der Datenbank</string>
+           </property>
+           <property name="text">
+            <string>Speichern</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QPushButton" name="pushButtonMagazineClearAll">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Löscht die gemachten Angaben aus den Steuerungselementen</string>
+           </property>
+           <property name="text">
+            <string>Eingaben löschen</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QComboBox" name="comboBoxMagazinePublishingRate">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Veröffentlichungs-Zyklus</string>
+           </property>
+           <item>
+            <property name="text">
+             <string>monatlich</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>vierteljährlich</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>halbjährlich</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>jährlich</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QLineEdit" name="lineEditMagazineLanguage">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Sprache des Werks</string>
+           </property>
+           <property name="placeholderText">
+            <string>Koreanisch</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </widget>
@@ -525,7 +614,7 @@
           <x>10</x>
           <y>10</y>
           <width>481</width>
-          <height>331</height>
+          <height>361</height>
          </rect>
         </property>
         <layout class="QFormLayout" name="formLayoutOthers">
@@ -643,7 +732,7 @@
           </widget>
          </item>
          <item row="2" column="0" colspan="2">
-          <widget class="QPlainTextEdit" name="plainTextEdit">
+          <widget class="QPlainTextEdit" name="plainTextEditOthersDescription">
            <property name="statusTip">
             <string>Füge eine treffene Beschreibung des neuen Artikels ein</string>
            </property>
@@ -652,41 +741,41 @@
            </property>
           </widget>
          </item>
+         <item row="3" column="0">
+          <widget class="QPushButton" name="pushButtonOthersSave">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Speichert die gemachten Angaben in der Datenbank</string>
+           </property>
+           <property name="text">
+            <string>Speichern</string>
+           </property>
+          </widget>
+         </item>
+         <item row="3" column="1">
+          <widget class="QPushButton" name="pushButtonOthersClearAll">
+           <property name="minimumSize">
+            <size>
+             <width>200</width>
+             <height>0</height>
+            </size>
+           </property>
+           <property name="statusTip">
+            <string>Löscht die gemachten Angaben aus den Steuerungselementen</string>
+           </property>
+           <property name="text">
+            <string>Eingaben löschen</string>
+           </property>
+          </widget>
+         </item>
         </layout>
        </widget>
       </widget>
-     </widget>
-     <widget class="QPushButton" name="pushButtonSave">
-      <property name="geometry">
-       <rect>
-        <x>200</x>
-        <y>400</y>
-        <width>100</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="statusTip">
-       <string>Speichern der gemachten Eingaben</string>
-      </property>
-      <property name="text">
-       <string>Speichern</string>
-      </property>
-     </widget>
-     <widget class="QPushButton" name="pushButtonClearAll">
-      <property name="geometry">
-       <rect>
-        <x>330</x>
-        <y>400</y>
-        <width>100</width>
-        <height>32</height>
-       </rect>
-      </property>
-      <property name="statusTip">
-       <string>Löschen der gemachten Eingaben</string>
-      </property>
-      <property name="text">
-       <string>Verwerfen</string>
-      </property>
      </widget>
     </widget>
     <widget class="QWidget" name="tabDeleteMedia">

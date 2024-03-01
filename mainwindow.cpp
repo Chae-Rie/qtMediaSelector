@@ -1,24 +1,79 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 
+
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
+    , m_ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    m_ui->setupUi(this);
 
-    /* Ich fände es auch toll, wenn es die Möglichkeit gäbe, eine Art Statusbar einzustellen
-     * am Besten am Grund des Mainwindows -> Dann sollte ich aber in einem Fenster bleiben.
-     * In der Statusbar, kann ich den Benutzer dann relativ gut über fehlgeschlagene
-     * Operationen hinweisen
-     * */
+
+
+
+
+    /* Der Übersichtlichkeithalber calle ich im Konstruktor eine Funktion, die die Steuerungselemente mit den
+    * jeweiligen Signalen und Slots verbindet.
+    *
+    */
+    connectWidgets();
+
+
+
+
+
 
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    delete m_ui;
 }
+
+/* Laut https://stackoverflow.com/questions/75384792/how-may-i-fix-my-error-prone-on-foo-bar-slots
+* ist deutlich besser, die Widgets selber durch den code mit den Steuerungselementen
+* zu verbinden, da die durch den Designer erzeugten Verbindungen nicht so stabil sind.
+* Heißt es würde Sinn ergeben, am Anfang, bei Erstellung des Dialogs, einmal alle Steuerungselemente
+* dementsprechend zu verbinden-
+*/
+void MainWindow::connectWidgets()
+{
+
+    // close() ist ein bereits vordefinierter slot, also brauche ich diesen nur hinter SLOT zu referenzieren
+    // -> Da er mit auf das clicked SIGNAL mit dem pushButtonQuit-Objekt verbunden ist, brauche ich nun nichts weiter machen
+    connect(m_ui->pushButtonQuit, SIGNAL (clicked()), this, SLOT (close()));
+
+    connect(m_ui->pushButtonBookSave, SIGNAL(clicked()), this, SLOT(handleButtonBookSaveClick()));
+
+    connect(m_ui->pushButtonMagazineSave, SIGNAL(released()), this, SLOT(handleButtonMagazineSaveClick()));
+
+}
+
+
+// Slot für den Klick auf "Speichern" in der Maske zum Erstellen eines neuen Eintrags von BÜCHERN
+void MainWindow::handleButtonBookSaveClick()
+{
+    qDebug() << "Trying to save everything out of the books-mask!";
+
+    m_Datamanager.m_BookContainer.title = m_ui->lineEditBookTitle->text();
+    m_Datamanager.m_BookContainer.author = m_ui->lineEditBookAuthor->text();
+    m_Datamanager.m_BookContainer.isbn = m_ui->lineEditISBN->text();
+    m_Datamanager.m_BookContainer.publisher = m_ui->lineEditBookPublisher->text();
+    m_Datamanager.m_BookContainer.genre = m_ui->lineEditBookGenre->text();
+    m_Datamanager.m_BookContainer.language = m_ui->lineEditBookLanguage->text();
+    m_Datamanager.m_BookContainer.condition = m_ui->comboBoxBooksCondition->currentText();
+    m_Datamanager.m_BookContainer.date = m_ui->dateEditBookReleaseDate->text();
+
+    // TODO: Test einbauen -> fake data einführen
+}
+
+void MainWindow::handleButtonMagazineSaveClick()
+{
+     qDebug() << "Trying to save everything out of the magazines-mask!";
+}
+
+
+
 
 
 // Was soll passieren, wenn man in das Menü klickt?
@@ -68,10 +123,13 @@ MainWindow::~MainWindow()
 
 
 
+/*
+ * Gibt es eine galante Möglichkeit, die bei den anderen Masken auch zu machen?
+ *
+*/
 
-// Manuelles Schließen der App durch den Benutzer, ohne das macos-typische X zu verwenden.
-void MainWindow::on_pushButtonQuit_clicked()
-{
-
-}
-
+/* Ich fände es auch toll, wenn es die Möglichkeit gäbe, eine Art Statusbar einzustellen
+     * am Besten am Grund des Mainwindows -> Dann sollte ich aber in einem Fenster bleiben.
+     * In der Statusbar, kann ich den Benutzer dann relativ gut über fehlgeschlagene
+     * Operationen hinweisen
+     * */
