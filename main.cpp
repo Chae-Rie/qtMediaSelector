@@ -1,4 +1,6 @@
 #include "mainwindow.h"
+#include "dbmanager.h"
+#include "helperfunction.h"
 #include <QApplication>
 
 int main(int argc, char *argv[])
@@ -12,10 +14,49 @@ int main(int argc, char *argv[])
      * Bevor ich das main-window öffne, möchte ich ein Dialog erstellen, der benutzer-credentials abfragt.
      * */
 
-    // Bevor der erste Dialog gezeigt wird, möchte ich die dementsprechenden Signale und Slots mit den Steuerungselementen verbinden
-    w.connectWidgets();
+
+    //QString currentDate =  HelperFunction::GetCurrentTime();    // Nachdem die Credentials bestätigt worden sind, soll die Datenbank erzeugt werden.
+
+    // Initialisierung der SQLite-Datenbank
+    DbManager SqlLiteDatabase;
+    SqlLiteDatabase.CreateMainTables();
 
 
+    Datamanager::BOOK_CONTENT myExampleBookContainer;
+    myExampleBookContainer.author = "moo",
+    myExampleBookContainer.isbn = "1337347234";
+    myExampleBookContainer.title = "ExampleTitle101";
+    myExampleBookContainer.genre = "Thriller";
+    myExampleBookContainer.publisher = "Hubert Burda Media AG";
+    myExampleBookContainer.date = "1999-05-23";
+    myExampleBookContainer.condition = "neuwertig";
+    myExampleBookContainer.language = "Fujoneze";
+
+    //SqlLiteDatabase.CreateNewRecord(myExampleBookContainer);
+
+    Datamanager::MAGAZINE_CONTENT myExampleMagazineContainer;
+    myExampleMagazineContainer.issn = "123-2343-45-4";
+    myExampleMagazineContainer.title = "Russia Today";
+    myExampleMagazineContainer.publisher = "Putins Mom";
+    myExampleMagazineContainer.genre = "PropagandaShit";
+    myExampleMagazineContainer.language = "Russkie jest";
+    myExampleMagazineContainer.publishingRate = "monatlich";
+    myExampleMagazineContainer.releaseDate = "1999-01-02";
+    myExampleMagazineContainer.condtion = "starke Gebrauchsspuren";
+
+    SqlLiteDatabase.CreateNewRecord(myExampleMagazineContainer);
+
+    Datamanager::OTHERS_CONTENT myExampleOthersContainer;
+    myExampleOthersContainer.number = "102343042340234Z";
+    myExampleOthersContainer.title = "Badminton-Set";
+    myExampleOthersContainer.publisher = "XY Badminton Ltd.";
+    myExampleOthersContainer.description = "2 Schläger, Farbe Schwarz, 1x Loch im Netz, abgegriffene Grifffläche";
+    myExampleOthersContainer.condition = "abgenutzt";
+
+    SqlLiteDatabase.CreateNewRecord(myExampleOthersContainer);
+
+    SqlLiteDatabase.PrintAllBooks();
+    SqlLiteDatabase.PrintAllTables();
     w.show();
 
     return a.exec();

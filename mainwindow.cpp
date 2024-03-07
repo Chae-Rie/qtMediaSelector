@@ -7,27 +7,25 @@ MainWindow::MainWindow(QWidget *parent)
     , m_ui(new Ui::MainWindow)
 {
     m_ui->setupUi(this);
-
-
-
-
-
     /* Der Übersichtlichkeithalber calle ich im Konstruktor eine Funktion, die die Steuerungselemente mit den
     * jeweiligen Signalen und Slots verbindet.
     *
     */
     connectWidgets();
-
-
-
-
-
-
 }
 
 MainWindow::~MainWindow()
 {
     delete m_ui;
+}
+
+void MainWindow::connectWidgets()
+{
+    connect(m_ui->pushButtonQuit, SIGNAL (clicked()), this, SLOT (close()));
+
+    connect(m_ui->pushButtonBookSave, SIGNAL(clicked()), this, SLOT(handleButtonBookSaveClick()));
+
+    connect(m_ui->pushButtonMagazineSave, SIGNAL(clicked()), this, SLOT(handleButtonMagazineSaveClick()));
 }
 
 /* Laut https://stackoverflow.com/questions/75384792/how-may-i-fix-my-error-prone-on-foo-bar-slots
@@ -36,33 +34,28 @@ MainWindow::~MainWindow()
 * Heißt es würde Sinn ergeben, am Anfang, bei Erstellung des Dialogs, einmal alle Steuerungselemente
 * dementsprechend zu verbinden-
 */
-void MainWindow::connectWidgets()
-{
-
-    // close() ist ein bereits vordefinierter slot, also brauche ich diesen nur hinter SLOT zu referenzieren
-    // -> Da er mit auf das clicked SIGNAL mit dem pushButtonQuit-Objekt verbunden ist, brauche ich nun nichts weiter machen
-    connect(m_ui->pushButtonQuit, SIGNAL (clicked()), this, SLOT (close()));
-
-    connect(m_ui->pushButtonBookSave, SIGNAL(clicked()), this, SLOT(handleButtonBookSaveClick()));
-
-    connect(m_ui->pushButtonMagazineSave, SIGNAL(released()), this, SLOT(handleButtonMagazineSaveClick()));
-
-}
 
 
 // Slot für den Klick auf "Speichern" in der Maske zum Erstellen eines neuen Eintrags von BÜCHERN
+// Aber was soll hier passieren?
+//
 void MainWindow::handleButtonBookSaveClick()
 {
     qDebug() << "Trying to save everything out of the books-mask!";
 
-    m_Datamanager.m_BookContainer.title = m_ui->lineEditBookTitle->text();
-    m_Datamanager.m_BookContainer.author = m_ui->lineEditBookAuthor->text();
-    m_Datamanager.m_BookContainer.isbn = m_ui->lineEditISBN->text();
-    m_Datamanager.m_BookContainer.publisher = m_ui->lineEditBookPublisher->text();
-    m_Datamanager.m_BookContainer.genre = m_ui->lineEditBookGenre->text();
-    m_Datamanager.m_BookContainer.language = m_ui->lineEditBookLanguage->text();
-    m_Datamanager.m_BookContainer.condition = m_ui->comboBoxBooksCondition->currentText();
-    m_Datamanager.m_BookContainer.date = m_ui->dateEditBookReleaseDate->text();
+
+    // std::vector<Datamanager::BOOK_CONTENT> m_BookBuffer;
+    // m_Datamanager.m_BookContainer.title = m_ui->lineEditBookTitle->text();
+    // m_Datamanager.m_BookContainer.author = m_ui->lineEditBookAuthor->text();
+    // m_Datamanager.m_BookContainer.isbn = m_ui->lineEditISBN->text();
+    // m_Datamanager.m_BookContainer.publisher = m_ui->lineEditBookPublisher->text();
+    // m_Datamanager.m_BookContainer.genre = m_ui->lineEditBookGenre->text();
+    // m_Datamanager.m_BookContainer.language = m_ui->lineEditBookLanguage->text();
+    // m_Datamanager.m_BookContainer.condition = m_ui->comboBoxBooksCondition->currentText();
+    // m_Datamanager.m_BookContainer.date = m_ui->dateEditBookReleaseDate->text();
+
+
+
 
     // TODO: Test einbauen -> fake data einführen
 }
