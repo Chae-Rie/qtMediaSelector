@@ -2,6 +2,15 @@
 
 DbManager::DbManager() {
 
+}
+
+DbManager::~DbManager(){}
+
+
+// Should connect client to local sqlite-database
+bool DbManager::Connect()
+{
+
     QString dbPath = "/Users/yoocherry/dev/local_projects/mediaSelector/database/mediaselector.db";
 
     // Spezifieren welche Datenbanktreiber verwendet werden sollen
@@ -16,14 +25,6 @@ DbManager::DbManager() {
     } else {
         qDebug() << "Connected with database under '" << db.databaseName() << "'";
     }
-}
-
-DbManager::~DbManager(){}
-
-
-// Should connect client to local sqlite-database
-bool DbManager::Connect()
-{
     // Was für Routinen könnte ich hier ausführen? Was ist hier sinnvoll?
     return false;
 }
@@ -101,47 +102,6 @@ bool DbManager::CreateMainTables()
 }
 
 
-// TODO: Galante Funktion schreiben, um die verschiedenen Einträge vernünftig darzustellen
-// Selbst für das Debuggen sollte das schon vernünftig sein
-// Die Lösung hierfür sind SqlRecords!
-
-void DbManager::PrintAllTables()
-{
-    QSqlDatabase db = QSqlDatabase::database();
-    bool isOpened = db.isOpen();
-
-    if (isOpened){
-        QSqlQuery query;
-
-        query.exec("SELECT * FROM books");
-
-         // Ergebnisse verarbeiten
-         while (query.next()) {
-             QString title = query.value("title").toString();
-
-             qDebug() << "Title of books:" << title;
-         }
-
-         query.exec("SELECT * from magazines");
-         while (query.next()){
-             QString title = query.value("title").toString();
-             qDebug() << "Title of magazines:" << title;
-         }
-
-         query.exec("SELECT * from others");
-         while(query.next()){
-
-             QString title = query.value("title").toString();
-             qDebug() << "Title of other media:" << title;
-         }
-
-    }else{
-        qDebug() << "Printing all tables failed!";
-        // bad
-    }
-}
-
-
 // Drucke alles was sich in der books Tabelle befindet
 bool DbManager::PrintAllBooks(){
     QSqlDatabase db = QSqlDatabase::database();
@@ -178,6 +138,16 @@ bool DbManager::PrintAllBooks(){
     } else {
         qDebug() << "PrintAllBooks() failed";
     }
+}
+
+bool DbManager::PrintAllMagazines()
+{
+    // TODO: Query schreiben
+}
+
+bool DbManager::PrintAllOthers()
+{
+    // TODO: Query schreiben
 }
 
 
@@ -219,9 +189,6 @@ bool DbManager::CreateNewRecord(Datamanager::BOOK_CONTENT newContent)
             qDebug() << "Created a new book record!";
             return true;
         }
-
-
-
     } else {
         qDebug() << "CreateNewRecord() failed getting a valid connection!"<< query.lastError().text();
         return false;
@@ -334,4 +301,32 @@ bool DbManager::CreateNewRecord(Datamanager::OTHERS_CONTENT newContent)
         qDebug() << "CreateNewRecord() failed getting a valid connection!"<< query.lastError().text();
         return false;
     }
+}
+
+bool DbManager::QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimiter)
+{
+    // Formuliere die Query
+    QString basicQuery = "SELECT * from";
+
+    basicQuery.append(tableWithDelimiter);
+
+    QSqlDatabase db = QSqlDatabase::database();
+
+
+    if (db.open()){
+
+        sqlModel->setQuery(basicQuery);
+
+
+        int rowCount = sqlModel->rowCount();
+        // Wie komme ich an die columns, der Query
+        QString columnname = sqlModel->headerData(3, Qt::Horizontal).toString();
+
+
+        return true;
+
+    } else {
+        qDebug() << "Opening database failed!";
+    }
+
 }

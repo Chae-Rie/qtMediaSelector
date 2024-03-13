@@ -3,6 +3,7 @@
 
 
 #include <QtSql/QSqlQueryModel> // Für die Abfrage von Inhalten aus der DB
+#include <QStandardItemModel>
 #include <QSqlQuery>
 #include "helperfunction.h"
 #include "datamanager.h"
@@ -20,7 +21,6 @@ public:
     bool Connect();
     bool Disconnect();
     bool CreateMainTables();
-    void PrintAllTables();
     bool PrintAllBooks();
     bool PrintAllMagazines();
     bool PrintAllOthers();
@@ -28,6 +28,8 @@ public:
     bool CreateNewRecord(Datamanager::BOOK_CONTENT newContent);
     bool CreateNewRecord(Datamanager::MAGAZINE_CONTENT newContent);
     bool CreateNewRecord(Datamanager::OTHERS_CONTENT newContent);
+
+    bool QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimiter);
 // Attribute
 private:
     QSqlDatabase m_database;

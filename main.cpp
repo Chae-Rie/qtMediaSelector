@@ -15,10 +15,14 @@ int main(int argc, char *argv[])
      * */
 
 
-    //QString currentDate =  HelperFunction::GetCurrentTime();    // Nachdem die Credentials bestätigt worden sind, soll die Datenbank erzeugt werden.
+    /* TODO:
+     * Wie komme ich denn zuverlässig an Graphen? Gibt es dazu auch ein passendes API?
+     * Vielleicht unter QT? Wo platziere ich den button für die Graphen?
+     */
 
     // Initialisierung der SQLite-Datenbank
     DbManager SqlLiteDatabase;
+    SqlLiteDatabase.Connect();
     SqlLiteDatabase.CreateMainTables();
 
 
@@ -32,7 +36,7 @@ int main(int argc, char *argv[])
     myExampleBookContainer.condition = "neuwertig";
     myExampleBookContainer.language = "Fujoneze";
 
-    //SqlLiteDatabase.CreateNewRecord(myExampleBookContainer);
+    // SqlLiteDatabase.CreateNewRecord(myExampleBookContainer);
 
     Datamanager::MAGAZINE_CONTENT myExampleMagazineContainer;
     myExampleMagazineContainer.issn = "123-2343-45-4";
@@ -44,7 +48,7 @@ int main(int argc, char *argv[])
     myExampleMagazineContainer.releaseDate = "1999-01-02";
     myExampleMagazineContainer.condtion = "starke Gebrauchsspuren";
 
-    SqlLiteDatabase.CreateNewRecord(myExampleMagazineContainer);
+    // SqlLiteDatabase.CreateNewRecord(myExampleMagazineContainer);
 
     Datamanager::OTHERS_CONTENT myExampleOthersContainer;
     myExampleOthersContainer.number = "102343042340234Z";
@@ -53,10 +57,9 @@ int main(int argc, char *argv[])
     myExampleOthersContainer.description = "2 Schläger, Farbe Schwarz, 1x Loch im Netz, abgegriffene Grifffläche";
     myExampleOthersContainer.condition = "abgenutzt";
 
-    SqlLiteDatabase.CreateNewRecord(myExampleOthersContainer);
+    // SqlLiteDatabase.CreateNewRecord(myExampleOthersContainer);
 
     SqlLiteDatabase.PrintAllBooks();
-    SqlLiteDatabase.PrintAllTables();
     w.show();
 
     return a.exec();

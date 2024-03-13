@@ -2,11 +2,16 @@
 #define MAINWINDOW_H
 
 #include "datamanager.h"
+#include "dbmanager.h"
 
 #include <QMainWindow>
 #include <QStatusBar>
 #include <QDebug>
 #include <QPushButton>
+#include <QComboBox>
+#include <QModelIndex>
+#include <QtSql/QSqlQueryModel>
+#include <QSqlRecord>
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -29,9 +34,19 @@ public:
 private slots:
     void handleButtonBookSaveClick();
     void handleButtonMagazineSaveClick();
+    void handleButtonOthersSaveClick();
+    void handleButtonClickSearchAllDatabase();
+    void handleSelectedNewFilter();
+    void handleRecordSelection(QModelIndex givenIndex);
+    void handleVerticalHeaderSelection(int rowindex);
+    void handleHorizontalHeaderSelection(int columnIndex);
+
+
 private:
+    inline QString GetComboBoxSelection(QComboBox* comboBox){return comboBox->currentText();};
     Ui::MainWindow *m_ui;
-    Datamanager m_Datamanager;
+    QString m_currentKeyword;
+    QSqlQueryModel* m_queryModel;
 
 
 };
