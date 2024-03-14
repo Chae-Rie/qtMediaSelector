@@ -30,10 +30,14 @@ public:
     bool CreateNewRecord(Datamanager::OTHERS_CONTENT newContent);
 
     bool QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimiter);
+    bool DeleteRecord(QString recordID);
+    inline void SetRecordId(QString recordId){m_currentlySelectedRecordID = recordId;};
+    inline QString GetRecordId(){return m_currentlySelectedRecordID;};
+
 // Attribute
 private:
     QSqlDatabase m_database;
-
+    QString m_currentlySelectedRecordID; // Ermittelte ID aus der "Löschen"-Maske -> Angeklickter Eintrag
 public:
     QString m_CurrentDate;
 

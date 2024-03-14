@@ -318,7 +318,7 @@ bool DbManager::QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimi
         sqlModel->setQuery(basicQuery);
 
 
-        int rowCount = sqlModel->rowCount();
+        //int rowCount = sqlModel.rowCount();
         // Wie komme ich an die columns, der Query
         QString columnname = sqlModel->headerData(3, Qt::Horizontal).toString();
 
@@ -329,4 +329,9 @@ bool DbManager::QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimi
         qDebug() << "Opening database failed!";
     }
 
+}
+
+bool DbManager::DeleteRecord(QString recordID)
+{
+// Query den scheiß
 }

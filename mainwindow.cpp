@@ -14,15 +14,18 @@ MainWindow::MainWindow(QWidget *parent)
     connectWidgets();
 
     // Es ist einfacher ein zentrales Modell zu verwalten als mehrere zu erzeugen und zu löschen
-    m_queryModel = new QSqlQueryModel;
 
+    m_dbmanager = std::make_unique<DbManager>();
+
+    m_queryModel = std::make_unique<QSqlQueryModel>();
     // Zum Start der Anwendung soll die Membervariable so Ihren Startwert bekommen.
     handleSelectedNewFilter();
 }
 
 MainWindow::~MainWindow()
 {
-    delete m_queryModel;
+
+    //delete m_dbmanager;
     delete m_ui;
 
 }
@@ -39,6 +42,8 @@ void MainWindow::connectWidgets()
 
     connect(m_ui->pushButtonSearchAllMedia, SIGNAL(clicked()), this, SLOT(handleButtonClickSearchAllDatabase()));
 
+    connect(m_ui->pushButtonDeleteMedia, SIGNAL(clicked()), this, SLOT(handleButtonClickDeleteMedia()));
+
     // --------------------------
     connect(m_ui->comboBoxFilterKeywords, SIGNAL(currentTextChanged(QString)), this, SLOT(handleSelectedNewFilter()));
 
@@ -49,6 +54,8 @@ void MainWindow::connectWidgets()
     connect( m_ui->tableView->verticalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleVerticalHeaderSelection(int)));
     // Signal für das Auswählen der Header der horizontal stehenden Header für die einzelnen SPALTEN
     connect( m_ui->tableView->horizontalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleHorizontalHeaderSelection(int)));
+
+
 }
 
 /* Laut https://stackoverflow.com/questions/75384792/how-may-i-fix-my-error-prone-on-foo-bar-slots
@@ -84,10 +91,7 @@ void MainWindow::handleButtonBookSaveClick()
     bookContent.date = m_ui->dateEditBookReleaseDate->text();
 
 
-    // Für die Kommunikation mit der Datenbank
-    DbManager dbManager;
-
-   bool success = dbManager.CreateNewRecord(bookContent);
+    bool success = m_dbmanager->CreateNewRecord(bookContent);
 
     if (success){
        qDebug() << "Creating a new record for books was successfull and returned true.";
@@ -115,9 +119,9 @@ void MainWindow::handleButtonMagazineSaveClick()
     magazineContent.condtion = m_ui->comboBoxMagazinesCondition->currentText();
     magazineContent.releaseDate = m_ui->dateEditMagazineReleaseDate->text();
 
-    DbManager dbManager;
 
-    bool success = dbManager.CreateNewRecord(magazineContent);
+
+    bool success = m_dbmanager->CreateNewRecord(magazineContent);
 
     if (success){
         qDebug() << "Creating a new record for magazines was successfull and returned true.";
@@ -137,9 +141,9 @@ void MainWindow::handleButtonOthersSaveClick(){
     othersContent.description = m_ui->plainTextEditOthersDescription->toPlainText();
     othersContent.condition = m_ui->comboBoxOthersCondition->currentText();
 
-    DbManager dbManager;
 
-    bool success = dbManager.CreateNewRecord(othersContent);
+
+    bool success = m_dbmanager->CreateNewRecord(othersContent);
 
     if (success){
         qDebug() << "Creating a new record for others was successfull and returned true.";
@@ -152,23 +156,23 @@ void MainWindow::handleButtonOthersSaveClick(){
 
 void MainWindow::handleButtonClickSearchAllDatabase(){
 
-    DbManager dbmanager;
+
 
     if (m_currentKeyword == "Zeitschriften"){
-        dbmanager.QueryDbEntries(m_queryModel, " magazines;");
+        m_dbmanager->QueryDbEntries(m_queryModel.get(), " magazines;");
     }
     else if (m_currentKeyword == "Bücher"){
-        dbmanager.QueryDbEntries(m_queryModel, " books;");
+        m_dbmanager->QueryDbEntries(m_queryModel.get(), " books;");
     }
     else if (m_currentKeyword == "Andere Medien"){
-        dbmanager.QueryDbEntries(m_queryModel, " others;");
+        m_dbmanager->QueryDbEntries(m_queryModel.get(), " others;");
     } else {
         // unspezifizierter Filter
         qDebug() << "Konnte Filter nicht genau ermitteln!";
         return;
     }
 
-    m_ui->tableView->setModel(m_queryModel);
+    m_ui->tableView->setModel(m_queryModel.get());
     m_ui->tableView->show();
 }
 
@@ -182,31 +186,73 @@ void MainWindow::handleSelectedNewFilter()
 void MainWindow::handleRecordSelection(QModelIndex givenIndex)
 {
 
-    int selectedColumn = givenIndex.column();
-    int selectedRow = givenIndex.row();
+    int rowIndex = givenIndex.row();
 
-    QSqlRecord record;
-    record =  m_queryModel->record(selectedRow);
+    QString recordID = GetIdOfSelection(rowIndex);
+    m_dbmanager->SetRecordId(recordID);
+    qDebug() << "We just selected the entry with the id: " << recordID;
 
-    // Get the id for the record, so we can query it for deletion -> id is always 0
-    QString recordId = record.value(0).toString();
-    qDebug() << "We just selected the entry with the id: " << recordId;
 }
 
 /* Da ein anderes Signal gesendet wird, wenn man mit der Maus, die Row oder Columns anklickt, die die ganze Zeile oder
  * Spalte markieren, braucht es eine eigene Funktion für das Auswählen, einzelner Felder in dem QTableView und für das
  * Auswählen der horizontalen und vertikalen Header
- *
+ * TODO: Ich möchte gern je nach dem welche Reihe bzw. welches Item ich auswähle
+ * die ID des Eintrags haben
  *
  */
 void MainWindow::handleVerticalHeaderSelection(int rowindex)
 {
     qDebug() <<  "We just selected the vertical header: " << rowindex;
+    QString recordID = GetIdOfSelection(rowindex);
+    m_dbmanager->SetRecordId(recordID);
+    qDebug() << "I clicked in row" << rowindex <<  " and the ID is: " << recordID;
 }
 
 void MainWindow::handleHorizontalHeaderSelection(int columnIndex)
 {
     qDebug() <<  "We just selected the horizontal header: " << columnIndex;
+
+    // wenn ich hier was auswählen und löschen würde, dann könnte ich die ganze Datenbank löschen. Das ist Schwachsinn
+
+    // Spaßighalber mal die Statusbar beschreiebn
+
+    m_ui->statusbar->showMessage("Test");
+}
+
+void MainWindow::handleButtonClickDeleteMedia()
+{
+    QString selectedRecordID = m_dbmanager->GetRecordId();
+    if (selectedRecordID.isEmpty()){
+        m_ui->statusbar->showMessage("Es wurde kein Eintrag ausgewählt!");
+        return;
+    }
+
+
+    QString question = "Bist Du sicher, dass Du den Eintrag unter der ID ";
+    question.append(selectedRecordID );
+    question.append(" wirklich aus der Datenbank löschen möchtest?");
+
+    QMessageBox::StandardButton reply;
+    reply = QMessageBox::question(this, "Medium löschen", question,
+                                  QMessageBox::Yes|QMessageBox::No);
+    if (reply == QMessageBox::Yes) {
+        qDebug() << "Yes was clicked, will procceed with querying database for deletion of entry with ID" << selectedRecordID;
+
+        m_dbmanager->DeleteRecord(selectedRecordID);
+    } else {
+        qDebug() << "Yes was *not* clicked";
+    }
+}
+
+QString MainWindow::GetIdOfSelection(int rowIndex)
+{
+    QSqlRecord record;
+    constexpr int positionOfId = 0; // Denn wir wissen, dass die ID immer an Erster Stelle steht
+
+    record = m_queryModel->record(rowIndex);
+
+    return record.value(positionOfId).toString();
 }
 
 
