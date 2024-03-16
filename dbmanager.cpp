@@ -140,16 +140,6 @@ bool DbManager::PrintAllBooks(){
     }
 }
 
-bool DbManager::PrintAllMagazines()
-{
-    // TODO: Query schreiben
-}
-
-bool DbManager::PrintAllOthers()
-{
-    // TODO: Query schreiben
-}
-
 
 
 /*
@@ -290,6 +280,7 @@ bool DbManager::CreateNewRecord(Datamanager::OTHERS_CONTENT newContent)
         query.bindValue(":condition", newContent.condition);
         query.bindValue(":current_date", currentDate);
 
+
         if(!(query.exec())){
             qDebug() << "Querying for new otherMedia record failed!" << query.lastError().text();
             return false;
@@ -326,12 +317,24 @@ bool DbManager::QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimi
         return true;
 
     } else {
-        qDebug() << "Opening database failed!";
+        qDebug() << "QueryDbEntries() failed getting a valid connection!"<< sqlModel->lastError().text();
     }
 
 }
 
-bool DbManager::DeleteRecord(QString recordID)
+// Scheinbar gibts kein Äquivalent zu bindValue bei QSqlQueryModel also verwaende ich die einfache QSqlQuery-API
+// wenn ich QSqlQueryModel auf Krampf bräuchte, könnte ich das dann auch mit dem QSqlQuery-Objekt verbinden.
+bool DbManager::DeleteRecord( QString table, QString recordID)
 {
-// Query den scheiß
+    QString basicQuery = "DELETE FROM " + table + " WHERE id = " + recordID + ";";
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    if (db.open()){
+        if (!(query.exec(basicQuery))){
+            qDebug() << "Querying the database for deletion failed with: " << query.lastError().text();
+        }
+    } else {
+        qDebug() << "DeleteRecord() failed getting a valid connection!"<< query.lastError().text();
+    }
 }

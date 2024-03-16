@@ -22,15 +22,13 @@ public:
     bool Disconnect();
     bool CreateMainTables();
     bool PrintAllBooks();
-    bool PrintAllMagazines();
-    bool PrintAllOthers();
 
     bool CreateNewRecord(Datamanager::BOOK_CONTENT newContent);
     bool CreateNewRecord(Datamanager::MAGAZINE_CONTENT newContent);
     bool CreateNewRecord(Datamanager::OTHERS_CONTENT newContent);
 
     bool QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimiter);
-    bool DeleteRecord(QString recordID);
+    bool DeleteRecord(QString table, QString recordID);
     inline void SetRecordId(QString recordId){m_currentlySelectedRecordID = recordId;};
     inline QString GetRecordId(){return m_currentlySelectedRecordID;};
 

@@ -3,6 +3,8 @@
 #include "helperfunction.h"
 #include <QApplication>
 
+#include "testdatabaseconnection.h"
+
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
@@ -10,6 +12,13 @@ int main(int argc, char *argv[])
 
 
 
+    // ------------- Teststuff
+
+
+    TestDatabaseConnection Test1;
+    QTest::qExec(&Test1, argc, argv);
+
+    // ------------- Teststuff
     /* TODO:
      * Bevor ich das main-window öffne, möchte ich ein Dialog erstellen, der benutzer-credentials abfragt.
      * */
@@ -26,36 +35,36 @@ int main(int argc, char *argv[])
     SqlLiteDatabase.CreateMainTables();
 
 
-    Datamanager::BOOK_CONTENT myExampleBookContainer;
-    myExampleBookContainer.author = "moo",
-    myExampleBookContainer.isbn = "1337347234";
-    myExampleBookContainer.title = "ExampleTitle101";
-    myExampleBookContainer.genre = "Thriller";
-    myExampleBookContainer.publisher = "Hubert Burda Media AG";
-    myExampleBookContainer.date = "1999-05-23";
-    myExampleBookContainer.condition = "neuwertig";
-    myExampleBookContainer.language = "Fujoneze";
+    // Datamanager::BOOK_CONTENT myExampleBookContainer;
+    // myExampleBookContainer.author = "moo",
+    // myExampleBookContainer.isbn = "1337347234";
+    // myExampleBookContainer.title = "ExampleTitle101";
+    // myExampleBookContainer.genre = "Thriller";
+    // myExampleBookContainer.publisher = "Hubert Burda Media AG";
+    // myExampleBookContainer.date = "1999-05-23";
+    // myExampleBookContainer.condition = "neuwertig";
+    // myExampleBookContainer.language = "Fujoneze";
 
-    // SqlLiteDatabase.CreateNewRecord(myExampleBookContainer);
+    // // SqlLiteDatabase.CreateNewRecord(myExampleBookContainer);
 
-    Datamanager::MAGAZINE_CONTENT myExampleMagazineContainer;
-    myExampleMagazineContainer.issn = "123-2343-45-4";
-    myExampleMagazineContainer.title = "Russia Today";
-    myExampleMagazineContainer.publisher = "Putins Mom";
-    myExampleMagazineContainer.genre = "PropagandaShit";
-    myExampleMagazineContainer.language = "Russkie jest";
-    myExampleMagazineContainer.publishingRate = "monatlich";
-    myExampleMagazineContainer.releaseDate = "1999-01-02";
-    myExampleMagazineContainer.condtion = "starke Gebrauchsspuren";
+    // Datamanager::MAGAZINE_CONTENT myExampleMagazineContainer;
+    // myExampleMagazineContainer.issn = "123-2343-45-4";
+    // myExampleMagazineContainer.title = "Russia Today";
+    // myExampleMagazineContainer.publisher = "Putins Mom";
+    // myExampleMagazineContainer.genre = "PropagandaShit";
+    // myExampleMagazineContainer.language = "Russkie jest";
+    // myExampleMagazineContainer.publishingRate = "monatlich";
+    // myExampleMagazineContainer.releaseDate = "1999-01-02";
+    // myExampleMagazineContainer.condtion = "starke Gebrauchsspuren";
 
-    // SqlLiteDatabase.CreateNewRecord(myExampleMagazineContainer);
+    // // SqlLiteDatabase.CreateNewRecord(myExampleMagazineContainer);
 
-    Datamanager::OTHERS_CONTENT myExampleOthersContainer;
-    myExampleOthersContainer.number = "102343042340234Z";
-    myExampleOthersContainer.title = "Badminton-Set";
-    myExampleOthersContainer.publisher = "XY Badminton Ltd.";
-    myExampleOthersContainer.description = "2 Schläger, Farbe Schwarz, 1x Loch im Netz, abgegriffene Grifffläche";
-    myExampleOthersContainer.condition = "abgenutzt";
+    // Datamanager::OTHERS_CONTENT myExampleOthersContainer;
+    // myExampleOthersContainer.number = "102343042340234Z";
+    // myExampleOthersContainer.title = "Badminton-Set";
+    // myExampleOthersContainer.publisher = "XY Badminton Ltd.";
+    // myExampleOthersContainer.description = "2 Schläger, Farbe Schwarz, 1x Loch im Netz, abgegriffene Grifffläche";
+    // myExampleOthersContainer.condition = "abgenutzt";
 
     // SqlLiteDatabase.CreateNewRecord(myExampleOthersContainer);
 

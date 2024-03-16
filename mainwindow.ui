@@ -83,7 +83,7 @@
        <enum>QTabWidget::North</enum>
       </property>
       <property name="currentIndex">
-       <number>1</number>
+       <number>0</number>
       </property>
       <widget class="QWidget" name="tabBooks">
        <attribute name="title">
@@ -867,7 +867,7 @@
         <widget class="QPushButton" name="pushButtonSearchAllMedia">
          <property name="maximumSize">
           <size>
-           <width>100</width>
+           <width>150</width>
            <height>16777215</height>
           </size>
          </property>
@@ -883,13 +883,13 @@
         <widget class="QPushButton" name="pushButtonDeleteMedia">
          <property name="minimumSize">
           <size>
-           <width>0</width>
+           <width>150</width>
            <height>0</height>
           </size>
          </property>
          <property name="maximumSize">
           <size>
-           <width>100</width>
+           <width>150</width>
            <height>16777215</height>
           </size>
          </property>
@@ -897,7 +897,7 @@
           <string>Löscht den ausgewählten Eintrag aus der Datenbank</string>
          </property>
          <property name="text">
-          <string>Löschen</string>
+          <string>Eintrag löschen</string>
          </property>
         </widget>
        </item>

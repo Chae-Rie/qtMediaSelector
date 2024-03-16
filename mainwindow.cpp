@@ -13,11 +13,11 @@ MainWindow::MainWindow(QWidget *parent)
     */
     connectWidgets();
 
-    // Es ist einfacher ein zentrales Modell zu verwalten als mehrere zu erzeugen und zu löschen
 
+    // Die wichtigsten Objekte werden sicher als unique_ptr erzeugt
     m_dbmanager = std::make_unique<DbManager>();
-
     m_queryModel = std::make_unique<QSqlQueryModel>();
+
     // Zum Start der Anwendung soll die Membervariable so Ihren Startwert bekommen.
     handleSelectedNewFilter();
 }
@@ -25,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
 MainWindow::~MainWindow()
 {
 
-    //delete m_dbmanager;
     delete m_ui;
 
 }
@@ -36,9 +35,15 @@ void MainWindow::connectWidgets()
 
     connect(m_ui->pushButtonBookSave, SIGNAL(clicked()), this, SLOT(handleButtonBookSaveClick()));
 
+    connect(m_ui->pushButtonBookClearAll, SIGNAL(clicked()), this, SLOT(handleButtonClickBookClear()));
+
     connect(m_ui->pushButtonMagazineSave, SIGNAL(clicked()), this, SLOT(handleButtonMagazineSaveClick()));
 
+    connect(m_ui->pushButtonMagazineClearAll, SIGNAL(clicked()), this, SLOT(handleButtonClickMagazineClear()));
+
     connect(m_ui->pushButtonOthersSave, SIGNAL(clicked()), this, SLOT(handleButtonOthersSaveClick()));
+
+    connect(m_ui->pushButtonOthersClearAll, SIGNAL(clicked()), this, SLOT(handleButtonClickOthersClear()));
 
     connect(m_ui->pushButtonSearchAllMedia, SIGNAL(clicked()), this, SLOT(handleButtonClickSearchAllDatabase()));
 
@@ -52,10 +57,9 @@ void MainWindow::connectWidgets()
 
     // Signal für das Auswählen der Header der vertikal stehenden Header für die einzelnen ZEILEN
     connect( m_ui->tableView->verticalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleVerticalHeaderSelection(int)));
+
     // Signal für das Auswählen der Header der horizontal stehenden Header für die einzelnen SPALTEN
     connect( m_ui->tableView->horizontalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleHorizontalHeaderSelection(int)));
-
-
 }
 
 /* Laut https://stackoverflow.com/questions/75384792/how-may-i-fix-my-error-prone-on-foo-bar-slots
@@ -101,7 +105,17 @@ void MainWindow::handleButtonBookSaveClick()
    }
 
 
-    // TODO: Test einbauen -> fake data einführen
+   // TODO: Test einbauen -> fake data einführen
+}
+
+void MainWindow::handleButtonClickBookClear()
+{
+    m_ui->lineEditBookTitle->clear();
+    m_ui->lineEditBookAuthor->clear();
+    m_ui->lineEditISBN->clear();
+    m_ui->lineEditBookPublisher->clear();
+    m_ui->lineEditBookGenre->clear();
+    m_ui->lineEditBookLanguage->clear();
 }
 
 void MainWindow::handleButtonMagazineSaveClick()
@@ -119,8 +133,6 @@ void MainWindow::handleButtonMagazineSaveClick()
     magazineContent.condtion = m_ui->comboBoxMagazinesCondition->currentText();
     magazineContent.releaseDate = m_ui->dateEditMagazineReleaseDate->text();
 
-
-
     bool success = m_dbmanager->CreateNewRecord(magazineContent);
 
     if (success){
@@ -128,6 +140,15 @@ void MainWindow::handleButtonMagazineSaveClick()
     } else {
         qDebug() << "Creating a new record for magazines was unsuccessfull and returned false.";
     }
+}
+
+void MainWindow::handleButtonClickMagazineClear()
+{
+    m_ui->lineEditISSN->clear();
+    m_ui->lineEditMagazineTitle->clear();
+    m_ui->lineEditMagazinePublisher->clear();
+    m_ui->lineEditMagazineGenre->clear();
+    m_ui->lineEditMagazineLanguage->clear();
 }
 
 void MainWindow::handleButtonOthersSaveClick(){
@@ -141,8 +162,6 @@ void MainWindow::handleButtonOthersSaveClick(){
     othersContent.description = m_ui->plainTextEditOthersDescription->toPlainText();
     othersContent.condition = m_ui->comboBoxOthersCondition->currentText();
 
-
-
     bool success = m_dbmanager->CreateNewRecord(othersContent);
 
     if (success){
@@ -152,11 +171,15 @@ void MainWindow::handleButtonOthersSaveClick(){
     }
 }
 
-
+void MainWindow::handleButtonClickOthersClear()
+{
+    m_ui->lineEditOthersNumber->clear();
+    m_ui->lineEditOthersTitle->clear();
+    m_ui->lineEditOthersPublisher->clear();
+    m_ui->plainTextEditOthersDescription->clear();
+}
 
 void MainWindow::handleButtonClickSearchAllDatabase(){
-
-
 
     if (m_currentKeyword == "Zeitschriften"){
         m_dbmanager->QueryDbEntries(m_queryModel.get(), " magazines;");
@@ -239,7 +262,20 @@ void MainWindow::handleButtonClickDeleteMedia()
     if (reply == QMessageBox::Yes) {
         qDebug() << "Yes was clicked, will procceed with querying database for deletion of entry with ID" << selectedRecordID;
 
-        m_dbmanager->DeleteRecord(selectedRecordID);
+        QString currentTable = GetComboBoxSelection(m_ui->comboBoxFilterKeywords);
+        if (currentTable == "Bücher"){
+            m_dbmanager->DeleteRecord("books", selectedRecordID);
+            handleButtonClickSearchAllDatabase();
+        } else if ( currentTable == "Zeitschriften"){
+            m_dbmanager->DeleteRecord("magazines", selectedRecordID);
+            handleButtonClickSearchAllDatabase();
+        }else if (currentTable == "Andere Medien"){
+            m_dbmanager->DeleteRecord("others", selectedRecordID);
+            handleButtonClickSearchAllDatabase();
+        } else {
+            qDebug() << "Failed deleting media because we couldn't determine a concrete table.";
+            return;
+        }
     } else {
         qDebug() << "Yes was *not* clicked";
     }

@@ -34,8 +34,11 @@ public:
 
 private slots:
     void handleButtonBookSaveClick();
+    void handleButtonClickBookClear();
     void handleButtonMagazineSaveClick();
+    void handleButtonClickMagazineClear();
     void handleButtonOthersSaveClick();
+    void handleButtonClickOthersClear();
     void handleButtonClickSearchAllDatabase();
     void handleSelectedNewFilter();
     void handleRecordSelection(QModelIndex givenIndex);
