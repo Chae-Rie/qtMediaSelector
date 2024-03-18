@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include "helperfunction.h"
 #include "datamanager.h"
+#include <QCoreApplication>
 
 class DbManager
 {
@@ -26,9 +27,11 @@ public:
     bool CreateNewRecord(Datamanager::BOOK_CONTENT newContent);
     bool CreateNewRecord(Datamanager::MAGAZINE_CONTENT newContent);
     bool CreateNewRecord(Datamanager::OTHERS_CONTENT newContent);
+    bool CreateNewRecord(Datamanager::USER_CREDENTIALS newContent);
 
     bool QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimiter);
     bool DeleteRecord(QString table, QString recordID);
+    bool CheckUserCredentials(Datamanager::USER_CREDENTIALS givenCredentials);
     inline void SetRecordId(QString recordId){m_currentlySelectedRecordID = recordId;};
     inline QString GetRecordId(){return m_currentlySelectedRecordID;};
 

@@ -3,6 +3,7 @@
 
 #include "datamanager.h"
 #include "dbmanager.h"
+#include "credentialdialog.h"
 
 #include <QMainWindow>
 #include <QStatusBar>
@@ -13,6 +14,8 @@
 #include <QtSql/QSqlQueryModel>
 #include <QSqlRecord>
 #include <QMessageBox>
+
+
 
 QT_BEGIN_NAMESPACE
 namespace Ui {
@@ -30,8 +33,6 @@ public:
     MainWindow(QWidget *parent = nullptr);
     ~MainWindow() override;
 
-
-
 private slots:
     void handleButtonBookSaveClick();
     void handleButtonClickBookClear();
@@ -45,20 +46,28 @@ private slots:
     void handleVerticalHeaderSelection(int rowindex);
     void handleHorizontalHeaderSelection(int columnIndex);
     void handleButtonClickDeleteMedia();
-
+    void handleClickOnTabbarStats(int);
+    void handleButtonClickLogout();
+    void handleButtonClickSearchUsers();
+    void handleButtonClickDeleteUsers();
 
 private:
     inline QString GetComboBoxSelection(QComboBox* comboBox){return comboBox->currentText();};
     void connectWidgets();
+
     QString GetIdOfSelection(int rowIndex);
 
 
     Ui::MainWindow *m_ui;
     QString m_currentKeyword;
-    //QString m_currentlySelectedRecordID; // Ermittelte ID aus der "Löschen"-Maske -> Angeklickter Eintrag
-    //QSqlQueryModel* m_queryModel;
+
+
     std::unique_ptr<DbManager> m_dbmanager;
     std::unique_ptr<QSqlQueryModel> m_queryModel;
+    std::unique_ptr<CredentialDialog> m_credentialDialog;
+
+public:
+    void Login(DbManager& refDbmanager);
 
 };
 #endif // MAINWINDOW_H

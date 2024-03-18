@@ -9,78 +9,117 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
+
+#TODO: Eine CMakeLists.txt für die Tests schreiben, dann wäre die CMakeLists.txt hier etwas aufgeräumter
+
 # Finden der Packages -> die müssen aber im Anschluss noch mit target_link_libraries
 # mit dem target, also der executeable verbunden werden
 find_package(QT NAMES Qt6 Qt5 REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Widgets)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Sql)
 find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Test)
+find_package(Qt${QT_VERSION_MAJOR} REQUIRED COMPONENTS Charts)
 
 set(PROJECT_SOURCES
-        main.cpp
         mainwindow.cpp
         mainwindow.h
         mainwindow.ui
+        credentialdialog.h
+        credentialdialog.cpp
+        credentialdialog.ui
 )
 
+
+# Erstelle eine statische Bibliothek für das Hauptprojekt
+add_library(mediaSelectorLib STATIC
+    ${PROJECT_SOURCES}
+    dbmanager.h dbmanager.cpp
+    datamanager.h datamanager.cpp
+    helperfunction.h helperfunction.cpp
+)
+
+# Verknüpfen der Bibliothek mit allem was sie braucht um lauffähig zu sein
+target_link_libraries(mediaSelectorLib PRIVATE
+        Qt${QT_VERSION_MAJOR}::Widgets
+        Qt${QT_VERSION_MAJOR}::Sql
+        Qt${QT_VERSION_MAJOR}::Charts
+)
+
+set (TEST_SOURCES
+    tests/testmain.cpp
+    tests/testdatabaseconnection.cpp
+    tests/testdatabaseconnection.h
+    tests/teststringoperations.h
+    tests/teststringoperations.cpp
+    tests/testdatabasequeries.h
+    tests/testdatabasequeries.cpp
+)
+
+# Fügen Sie Unittests hinzu
+# Jetzt bekommt also die .exe für die Tests alle Inhalte der PROJECT_SOURCES und
+# der offensichtlichen Testdateien (die hoffentlich immer test im Namen haben)
+# sie heißt mediaSelectorTests
 if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
-    qt_add_executable(mediaSelector
-        MANUAL_FINALIZATION
+    qt_add_executable(mediaSelectorTests
         ${PROJECT_SOURCES}
-        dbmanager.h dbmanager.cpp
-        datamanager.h datamanager.cpp
-        helperfunction.h helperfunction.cpp
-        testdatabaseconnection.h testdatabaseconnection.cpp
+        ${TEST_SOURCES}
+        dbmanager.cpp datamanager.cpp helperfunction.cpp
+
     )
-# Define target properties for Android with Qt 6 as:
-#    set_property(TARGET mediaSelector APPEND PROPERTY QT_ANDROID_PACKAGE_SOURCE_DIR
-#                 ${CMAKE_CURRENT_SOURCE_DIR}/android)
-# For more information, see https://doc.qt.io/qt-6/qt-add-executable.html#target-creation
 else()
-    if(ANDROID)
-        add_library(mediaSelector SHARED
-            ${PROJECT_SOURCES}
-        )
-# Define properties for Android with Qt 5 after find_package() calls as:
-#    set(ANDROID_PACKAGE_SOURCE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/android")
-    else()
-        add_executable(mediaSelector
-            ${PROJECT_SOURCES}
-        )
-    endif()
+    add_executable(mediaSelectorTests
+        ${PROJECT_SOURCES}
+        ${TEST_SOURCES}
+    )
 endif()
 
-# Verknüpfen der gefundenen Pakete mit dem target, also der executable
-target_link_libraries(mediaSelector PRIVATE
+# Pakete mit der Test-Executable verbinden
+target_link_libraries(mediaSelectorTests PRIVATE
     Qt${QT_VERSION_MAJOR}::Widgets
     Qt${QT_VERSION_MAJOR}::Sql
     Qt${QT_VERSION_MAJOR}::Test
 )
 
 
-
-
-# Qt for iOS sets MACOSX_BUNDLE_GUI_IDENTIFIER automatically since Qt 6.1.
-# If you are developing for iOS or macOS you should consider setting an
-# explicit, fixed bundle identifier manually though.
-if(${QT_VERSION} VERSION_LESS 6.1.0)
-  set(BUNDLE_ID_OPTION MACOSX_BUNDLE_GUI_IDENTIFIER com.example.mediaSelector)
-endif()
-set_target_properties(mediaSelector PROPERTIES
-    ${BUNDLE_ID_OPTION}
-    MACOSX_BUNDLE_BUNDLE_VERSION ${PROJECT_VERSION}
-    MACOSX_BUNDLE_SHORT_VERSION_STRING ${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}
-    MACOSX_BUNDLE TRUE
-    WIN32_EXECUTABLE TRUE
+# Erstelle die Anwendung, achte auf den Suffix App
+add_executable(mediaSelectorApp
+    main.cpp
 )
 
+
+# Verknüpfen der gefundenen Pakete mit der Anwendungs-Target
+# Heißt die ausführbare Datei
+target_link_libraries(mediaSelectorApp PRIVATE
+    mediaSelectorLib
+    Qt${QT_VERSION_MAJOR}::Widgets
+    Qt${QT_VERSION_MAJOR}::Sql
+)
+
+
+# Setze die Ziel-Eigenschaften für die Unittests
+set_target_properties(mediaSelectorTests PROPERTIES
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+    BUNDLE_ID "com.example.mediaSelector.tests"
+)
+
+# Setze die Ziel-Eigenschaften für die Anwendung
+set_target_properties(mediaSelectorApp PROPERTIES
+    MACOSX_BUNDLE TRUE
+    WIN32_EXECUTABLE TRUE
+    BUNDLE_ID "com.example.mediaSelector.app"
+)
+
+
 include(GNUInstallDirs)
-install(TARGETS mediaSelector
+install(TARGETS mediaSelectorApp mediaSelectorLib
     BUNDLE DESTINATION .
     LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
 
 if(QT_VERSION_MAJOR EQUAL 6)
-    qt_finalize_executable(mediaSelector)
+    qt_finalize_executable(mediaSelectorApp)
+
 endif()

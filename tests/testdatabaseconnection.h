@@ -5,14 +5,19 @@
 #include <QTest>
 #include <QSqlDatabase>
 
+
 class TestDatabaseConnection : public QObject
 {
-
+    // Ohne das Macro findet er die Testfunktion nicht
+    Q_OBJECT
 private slots:
     void initTestCase();
     void testConnection();
-    void testMyConnection();
+
     void cleanupTestCase();
+
+private:
+
 };
 
 #endif // TESTDATABASECONNECTION_H

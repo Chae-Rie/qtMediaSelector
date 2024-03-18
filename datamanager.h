@@ -42,6 +42,14 @@ public:
         QString description;
         QString condition;
     }OTHERS_CONTENT;
+
+    typedef struct USER_CREDENTIALS{
+        QString name;
+        QString lastname;
+        QString email;
+        QString password;
+        QString role;
+    } USER_CREDENTIALS;
 };
 
 #endif // DATAMANAGER_H

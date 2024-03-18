@@ -18,6 +18,7 @@ MainWindow::MainWindow(QWidget *parent)
     m_dbmanager = std::make_unique<DbManager>();
     m_queryModel = std::make_unique<QSqlQueryModel>();
 
+
     // Zum Start der Anwendung soll die Membervariable so Ihren Startwert bekommen.
     handleSelectedNewFilter();
 }
@@ -49,10 +50,12 @@ void MainWindow::connectWidgets()
 
     connect(m_ui->pushButtonDeleteMedia, SIGNAL(clicked()), this, SLOT(handleButtonClickDeleteMedia()));
 
+    connect(m_ui->pushButtonLogout, SIGNAL(clicked()), this, SLOT(handleButtonClickLogout()));
+
     // --------------------------
     connect(m_ui->comboBoxFilterKeywords, SIGNAL(currentTextChanged(QString)), this, SLOT(handleSelectedNewFilter()));
 
-    // Signal für das Auswählen einzelner Felder in dem QTableView
+    // Signal für das Auswählen einzelner Felder in dem QTableView für die Medien
     connect(m_ui->tableView, SIGNAL(clicked(QModelIndex)), this, SLOT(handleRecordSelection(QModelIndex)));
 
     // Signal für das Auswählen der Header der vertikal stehenden Header für die einzelnen ZEILEN
@@ -60,7 +63,25 @@ void MainWindow::connectWidgets()
 
     // Signal für das Auswählen der Header der horizontal stehenden Header für die einzelnen SPALTEN
     connect( m_ui->tableView->horizontalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleHorizontalHeaderSelection(int)));
+
+    // -------------------------- Für die Darstellung von Graphen
+
+    connect(m_ui->tableViewUsers, SIGNAL(clicked(QModelIndex)), this, SLOT(handleRecordSelection(QModelIndex))); // Is das ok?
+
+    connect(m_ui->tableViewUsers->verticalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleVerticalHeaderSelection(int)));
+
+    connect(m_ui->tableViewUsers->horizontalHeader(), SIGNAL(sectionPressed(int)), this, SLOT(handleHorizontalHeaderSelection(int)));
+
+    connect(m_ui->pushButtonSearchUser, SIGNAL(clicked()), this, SLOT(handleButtonClickSearchUsers()));
+
+    connect(m_ui->pushButtonDeleteUser, SIGNAL(clicked()), this, SLOT(handleButtonClickDeleteUsers()));
+    /*
+     * Ein Klick auf die Tabbar "Stats/History" soll ein kleines Fenster erzeugen welches aus einem Graphen besteht
+    */
+
+    connect(m_ui->tabWidgetStats, SIGNAL(tabBarClicked(int)), this, SLOT(handleClickOnTabbarStats(int)));
 }
+
 
 /* Laut https://stackoverflow.com/questions/75384792/how-may-i-fix-my-error-prone-on-foo-bar-slots
 * ist deutlich besser, die Widgets selber durch den code mit den Steuerungselementen
@@ -281,6 +302,79 @@ void MainWindow::handleButtonClickDeleteMedia()
     }
 }
 
+void MainWindow::handleClickOnTabbarStats(int)
+{
+    // // Das MainWindow-Objekt ist bereits erstellt worden, es muss demnach nur aktualisiert werden
+
+    // // Hartcodierte Daten für den Graphen
+    // QList<QPair<QString, int>> bookData;
+    // bookData << qMakePair("Fiktion", 20)
+    //          << qMakePair("Non-Fiktion", 15)
+    //          << qMakePair("Fantasy", 10)
+    //          << qMakePair("Thriller", 8);
+
+    // // Erstellung eines Balkendiagramms
+    // QBarSeries *series = new QBarSeries();
+    // for (const auto &data : bookData) {
+    //     QBarSet *set = new QBarSet(data.first);
+    //     *set << data.second;
+    //     series->append(set);
+    // }
+
+    // // Erstellung des Diagramms
+    // QChart *chart = new QChart();
+    // chart->addSeries(series);
+    // chart->setTitle("Anzahl der ausgeliehenen Bücher nach Genre");
+    // chart->setAnimationOptions(QChart::SeriesAnimations);
+
+    // // Kategorienachse
+    // QBarCategoryAxis *axisX = new QBarCategoryAxis();
+    // QStringList categories;
+    // for (const auto &data : bookData) {
+    //     categories << data.first;
+    // }
+    // axisX->append(categories);
+    // chart->addAxis(axisX, Qt::AlignBottom);
+    // series->attachAxis(axisX);
+
+    // // Wertachse
+    // QValueAxis *axisY = new QValueAxis();
+    // chart->addAxis(axisY, Qt::AlignLeft);
+    // series->attachAxis(axisY);
+
+    // QGraphicsScene *scene = new QGraphicsScene();
+    // scene->addItem(chart);
+    // m_ui->graphicsView->setScene(scene);
+
+}
+
+void MainWindow::handleButtonClickLogout()
+{
+
+    if (m_credentialDialog.get()->exec() == QDialog::Accepted) {
+        // Anmeldeinformationen sind korrekt
+        // Schließen des AnmeldeDialogs -> Öffnen des MainDialogs
+
+        return;
+    }
+}
+
+void MainWindow::handleButtonClickSearchUsers()
+{
+    m_dbmanager->QueryDbEntries(m_queryModel.get(), " users;");
+
+    m_ui->tableViewUsers->setModel(m_queryModel.get());
+    m_ui->tableViewUsers->show();
+}
+
+void MainWindow::handleButtonClickDeleteUsers()
+{
+    QString selectedRecordID = m_dbmanager->GetRecordId();
+    m_dbmanager->DeleteRecord("users", selectedRecordID);
+    // Aktualisiert das Tableview direkt
+    handleButtonClickSearchUsers();
+}
+
 QString MainWindow::GetIdOfSelection(int rowIndex)
 {
     QSqlRecord record;
@@ -291,38 +385,17 @@ QString MainWindow::GetIdOfSelection(int rowIndex)
     return record.value(positionOfId).toString();
 }
 
+void MainWindow::Login(DbManager& refDbmanager)
+{
+    m_credentialDialog = std::make_unique<CredentialDialog>(refDbmanager);
+    //CredentialDialog credentialDialog(refDbmanager);
 
+    if (m_credentialDialog.get()->exec() == QDialog::Accepted) {
+        // Anmeldeinformationen sind korrekt
+        // Schließen des AnmeldeDialogs -> Öffnen des MainDialogs
 
-/*
- * Idee:
- * Das wechseln zwischen den Tabs zeigt verschiedene Editcontrols an, die der Benutzer dann dementsprechend
- * mit passendem Inhalt füllen kann. Diese Editcontrols sollen, auch möglichst einfach den Input verarbeiten
- * und auch inhaltliche Richtigkeit überprüfen.
- * Wenn das geschehen ist, soll der Benutzer den Inhalt der Editcontrols mit einem Klick auf
- * "Speichern" in ein generisches Objekt laden können und mit einem Klick auf "Verwerfen" alle
- * bereits gemachten Eingaben aus dem Editcontrol löschen können.
- *
- * Das generische Objekt, soll dann für die Versendung an die Datenbank serialisiert werden.
- * Die Nutzung einer einfach SQLite Datenbank wird den Job schon erledigen.
- *
- * Frage: Wie könnte diese Struktur des generischen Objekts aussehen?
- * Ich könnte auch für den Anfang 3 eindeutig zu definierende Objekte verwenden, die jeweils eine
- * Klasse bekommen.
- * Oder ich verwende eine große Struktur mit Feldern, die im Falle eines Falles Standardwerte mit
- * NULL zugewiesen bekommen.
- * Was ist hier am smartesten?
- *
- */
+        // Prüfung nach Rolle und dann die Benutzerverwaltung darstellen
 
-
-
-/*
- * Gibt es eine galante Möglichkeit, die bei den anderen Masken auch zu machen?
- *
-*/
-
-/* Ich fände es auch toll, wenn es die Möglichkeit gäbe, eine Art Statusbar einzustellen
-     * am Besten am Grund des Mainwindows -> Dann sollte ich aber in einem Fenster bleiben.
-     * In der Statusbar, kann ich den Benutzer dann relativ gut über fehlgeschlagene
-     * Operationen hinweisen
-     * */
+        return;
+    }
+}

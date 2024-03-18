@@ -10,14 +10,17 @@ DbManager::~DbManager(){}
 // Should connect client to local sqlite-database
 bool DbManager::Connect()
 {
+    //QString currentDir = QCoreApplication::applicationDirPath();
+    // QString dbPath = "/Users/yoocherry/dev/local_projects/mediaSelector/database/mediaselector.db";
 
-    QString dbPath = "/Users/yoocherry/dev/local_projects/mediaSelector/database/mediaselector.db";
 
+    //QString dbPath = "../" + currentDir + "/testdb/mediaselector.db";
     // Spezifieren welche Datenbanktreiber verwendet werden sollen
     QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
 
     // Wie heißt die Datenbank-Datei und wo liegt sie?
-    db.setDatabaseName(dbPath);
+    //db.setDatabaseName(dbPath);
+    db.setDatabaseName("mediaselector.db");
 
     // Überprüfen, ob die Verbindung erfolgreich hergestellt wurde
     if (!db.open()) {
@@ -87,18 +90,42 @@ bool DbManager::CreateMainTables()
             "created_on DATE"
             ");";
 
+        QString usersTable =
+            "CREATE TABLE IF NOT EXISTS users ("
+            "id INTEGER PRIMARY KEY,"
+            "name TEXT,"
+            "lastname TEXT,"
+            "email TEXT,"
+            "password TEXT,"
+            "created_on DATE,"
+            "role TEXT"
+            ");";
+
+        QString borrowedMediaTable =
+            "CREATE TABLE IF NOT EXISTS borrowedMedia ("
+            "id INTEGER PRIMARY KEY,"
+            "user_id INTEGER,"
+            "media_id INTEGER,"
+            "borrowed_on DATE,"
+            "borrowed_until DATE"
+            ");";
+
         QSqlQuery query(db);
-        bool success = (query.exec(bookTable) && query.exec(magazineTable) && query.exec(othersTable));
+        bool success = (
+            query.exec(bookTable) && query.exec(magazineTable) && query.exec(othersTable) && query.exec(usersTable) && query.exec(borrowedMediaTable)
+                        );
 
         if (!success){
-            qDebug() << "Query failed with";
+            qDebug() << "Query failed with" << query.lastError().text();
         } else {
-            qDebug() << "all good brother";
+            qDebug() << "Database creation was successfully";
             return true;
         }
     } else {
         // try to open it and try again
+        return false;
     }
+    return false;
 }
 
 
@@ -136,7 +163,7 @@ bool DbManager::PrintAllBooks(){
         }
 
     } else {
-        qDebug() << "PrintAllBooks() failed";
+        qDebug() << "PrintAllBooks() failed with" << query.lastError().text();
     }
 }
 
@@ -294,6 +321,109 @@ bool DbManager::CreateNewRecord(Datamanager::OTHERS_CONTENT newContent)
     }
 }
 
+bool DbManager::CreateNewRecord(Datamanager::USER_CREDENTIALS newContent)
+{
+    QSqlDatabase db = QSqlDatabase::database();
+
+    QSqlQuery query(db);
+
+    if (db.isOpen()){
+        QString currentDate = HelperFunction::GetCurrentTime();
+
+        QString basicQuery = "INSERT INTO users (name, lastname, email, password, created_on, role) "
+                             "VALUES(:name, :lastname, :email, :password, :current_date, :role);";
+
+        if (!(query.prepare(basicQuery))){
+            qDebug() << "prepare already failed (others)" << query.lastError().text();
+            return false;
+        }
+
+
+        query.bindValue(":name", newContent.name);
+        query.bindValue(":lastname", newContent.lastname);
+        query.bindValue(":email", newContent.email);
+        query.bindValue(":password", newContent.password);
+        query.bindValue(":current_date", currentDate);
+        query.bindValue(":role", newContent.role);
+
+        if(!(query.exec())){
+            qDebug() << "Querying for new usercredentials record failed!" << query.lastError().text();
+            return false;
+        } else {
+            qDebug() << "Created a new usercredentials record!";
+            return true;
+        }
+    } else {
+        qDebug() << "CreateNewRecord() failed getting a valid connection!"<< query.lastError().text();
+        return false;
+    }
+}
+
+// Scheinbar gibts kein Äquivalent zu bindValue bei QSqlQueryModel also verwaende ich die einfache QSqlQuery-API
+// wenn ich QSqlQueryModel auf Krampf bräuchte, könnte ich das dann auch mit dem QSqlQuery-Objekt verbinden.
+bool DbManager::DeleteRecord( QString table, QString recordID)
+{
+    QString basicQuery = "DELETE FROM " + table + " WHERE id = " + recordID + ";";
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    if (db.open()){
+        if (!(query.exec(basicQuery))){
+            qDebug() << "Querying the database for deletion failed with: " << query.lastError().text();
+            return false;
+        } else{
+            return true;
+        }
+
+    } else {
+        qDebug() << "DeleteRecord() failed getting a valid connection!"<< query.lastError().text();
+        return false;
+    }
+}
+
+bool DbManager::CheckUserCredentials(Datamanager::USER_CREDENTIALS givenCredentials)
+{
+
+    // Formulierung der SQL-Abfrage
+    QString basicQuery = "SELECT COUNT(*) FROM users WHERE name = :name AND lastname = :lastname AND email = :email AND password = :password AND role = :role";
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+
+    if (db.open()){
+
+        if (!(query.prepare(basicQuery))){
+            qDebug() << "prepare already failed (others)" << query.lastError().text();
+            return false;
+        }
+
+        // Binden der Parameter an die Abfrage
+        query.bindValue(":name", givenCredentials.name);
+        query.bindValue(":lastname", givenCredentials.lastname);
+        query.bindValue(":email", givenCredentials.email);
+        query.bindValue(":password", givenCredentials.password);
+        query.bindValue(":role", givenCredentials.role);
+
+        // Ausführen der Abfrage
+        if (query.exec()) {
+            query.first(); // Gehe zum ersten Datensatz
+            int count = query.value(0).toInt(); // Wert des ersten Feldes abrufen (Anzahl der übereinstimmenden Datensätze)
+
+            if (count > 0) {
+                // Benutzerdaten stimmen überein, der Benutzer kann sich anmelden
+                qDebug() << "Found exact user, login allowed!";
+                return true;
+            } else {
+                // Benutzerdaten stimmen nicht überein, der Benutzer kann sich nicht anmelden
+                qDebug() << "Couldn't find user, login not allowed!";
+                return false;
+            }
+    } else {
+        qDebug() << "CheckUserCredentials() failed getting a valid connection!" << query.lastError().text();
+        return false;
+        }
+    }
+}
+
 bool DbManager::QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimiter)
 {
     // Formuliere die Query
@@ -311,30 +441,12 @@ bool DbManager::QueryDbEntries(QSqlQueryModel* sqlModel, QString tableWithDelimi
 
         //int rowCount = sqlModel.rowCount();
         // Wie komme ich an die columns, der Query
-        QString columnname = sqlModel->headerData(3, Qt::Horizontal).toString();
-
-
+        // QString columnname = sqlModel->headerData(3, Qt::Horizontal).toString();
         return true;
-
     } else {
         qDebug() << "QueryDbEntries() failed getting a valid connection!"<< sqlModel->lastError().text();
     }
-
 }
 
-// Scheinbar gibts kein Äquivalent zu bindValue bei QSqlQueryModel also verwaende ich die einfache QSqlQuery-API
-// wenn ich QSqlQueryModel auf Krampf bräuchte, könnte ich das dann auch mit dem QSqlQuery-Objekt verbinden.
-bool DbManager::DeleteRecord( QString table, QString recordID)
-{
-    QString basicQuery = "DELETE FROM " + table + " WHERE id = " + recordID + ";";
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query(db);
 
-    if (db.open()){
-        if (!(query.exec(basicQuery))){
-            qDebug() << "Querying the database for deletion failed with: " << query.lastError().text();
-        }
-    } else {
-        qDebug() << "DeleteRecord() failed getting a valid connection!"<< query.lastError().text();
-    }
-}
+

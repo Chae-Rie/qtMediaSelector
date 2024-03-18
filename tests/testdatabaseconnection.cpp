@@ -19,13 +19,10 @@ void TestDatabaseConnection::testConnection()
     QVERIFY(db.isOpen());
 }
 
-void TestDatabaseConnection::testMyConnection()
-{
-
-}
-
 void TestDatabaseConnection::cleanupTestCase()
 {
     // Close database connection
     QSqlDatabase::database().close();
 }
+
+
